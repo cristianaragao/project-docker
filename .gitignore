@@ -1,0 +1,11 @@
+/backend/package-lock.json
+/backend/yarn.lock
+/backend/node_modules
+
+/frontend/node_modules
+/frontend/yarn.lock
+/frontend/package-lock.json
+
+/db1/db
+
+/db2/db

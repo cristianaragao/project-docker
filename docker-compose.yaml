@@ -1,0 +1,87 @@
+version: "3.9"
+services:
+  frontend:
+
+    container_name: frontend
+
+    restart: always
+
+    build:
+      context: ./frontend
+
+    ports:
+      - "80:3001"
+
+    depends_on:
+      - backend
+      - db1
+      - db2
+
+  backend:
+    container_name: backend
+
+    restart: always
+
+    build:
+      context: ./backend
+
+    depends_on:
+      db1:
+        condition: service_healthy
+      db2:
+        condition: service_healthy
+
+    ports:
+      - "8080:8080"
+
+    environment:
+      DB1_URL: "db1:3306"
+      DB2_URL: "db2:3307"
+
+  db1:
+    image: mysql:5.7
+
+    container_name: db1
+
+    restart: always
+
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: database1
+
+    healthcheck:
+      test: "mysql -uroot -proot -e 'select 1;'"
+      interval: 5s
+      timeout: 30s
+      retries: 10
+      start_period: 5s
+
+    ports:
+      - "3306:3306"
+
+    volumes:
+      - ./db1/db/data:/var/lib/mysql
+
+  db2:
+    image: mysql:5.7
+
+    container_name: db2
+
+    tty: true
+
+    ports:
+      - "3307:3306"
+
+    healthcheck:
+      test: "mysql -uroot -proot -e 'select 1;'"
+      interval: 5s
+      timeout: 30s
+      retries: 10
+      start_period: 5s
+
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: database2
+
+    volumes:
+      - ./db2/db/data:/var/lib/mysql
